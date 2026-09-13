@@ -41,6 +41,7 @@ olares-cli market upload ./<app>-<version>.tgz   # use the new <version> in the 
 ```
 
 - `chart package` mirrors `helm package` and preserves `OlaresManifest.yaml`, so the archive is accepted as-is by both `chart lint` and `market upload`. A bumped version yields a new `<app>-<version>.tgz` name: pass that name to `upload` and the new number to `install` / `upgrade --version`.
+- Repackaging **without** bumping the version targets the file the previous run wrote, so `chart package` refuses rather than replacing it: `archive already exists: <path>`. Bump the version, choose another `-o` directory, or pass `--force` to overwrite deliberately. This is why the loop in D4 bumps first and packages second.
 - `upload` always lands the chart in the `upload` source (see [`../../olares-market/SKILL.md`](../../olares-market/SKILL.md)). `-s` is intentionally not exposed.
 - Upload runs the server-side ingest, so a chart that passed local `lint` can still be rejected here (e.g. cluster-specific checks). Surface that message as a chart problem and go back to refine.
 - Nothing left locally to package? `market download <app>` pulls the stored `.tgz` back — never re-author a chart the Olares still holds (the [`olares-market`](../../olares-market/SKILL.md) skill's charts reference, `download`).
